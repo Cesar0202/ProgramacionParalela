@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FrasesAJAX</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="app.js"></script> <!-- Incluimos el archivo JavaScript externo -->
+    <link rel="stylesheet" href="styles.css"> <!-- Incluimos el archivo CSS externo -->
+
+</head>
+<body>
+
+    <div id="titulo">FrasesAJAX</div>    
+    <div id="cronometro">Tiempo transcurrido: 0 segundos</div>
+    <div id="buscador">
+        <label for="categoria">Busca una categoría:</label>
+        <input type="text" id="categoria">
+    </div>
+    <button id="obtenerFrases">Obtener Frases</button>
+
+    <div id="resultado">
+        <h2>Resultado de la petición:</h2>
+        <ul id="listaResultado"></ul>
+    </div>
+
+</body>
+</html>
