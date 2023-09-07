@@ -1,0 +1,86 @@
+/* Estilo para el cuerpo de la página */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+/* Estilo para el encabezado */
+h2 {
+    color: #333;
+}
+
+/* Estilo para el contenedor principal */
+#titulo, #cronometro, #buscador, #categoria, #obtenerFrases, #resultado {
+    width: 80%;
+    max-width: 600px;
+    margin: 10px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo para el titulo principal */
+#titulo {
+    font-size: 24px;
+    font-weight: bold;
+    font-family: 'Helvetica Neue', sans-serif;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Estilo para el Buscador ("Busca una categoría:" + cuadro de búsqueda) */
+#buscador {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Estilo para el cuadro de búsqueda */
+#categoria {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+
+/* Estilo para el botón "Obtener Frases" */
+#obtenerFrases {
+    display: block;
+    text-align: center;
+    width: 80%;
+    max-width: 640px;
+    margin: 10px auto;
+    padding: 10px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Estilo para la lista de resultados */
+#listaResultado {
+    list-style: none;
+    padding: 0;
+}
+
+/* Estilo para los elementos de la lista */
+#listaResultado li {
+    margin: 10px 0;
+}
+
+/* Estilo para los enlaces */
+a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+/* Estilo para los enlaces al pasar el cursor sobre ellos */
+a:hover {
+    text-decoration: underline;
+}
