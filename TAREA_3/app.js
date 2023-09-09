@@ -36,3 +36,42 @@ $(document).ready(function() {
 
         // Construir la URL con la categoría seleccionada
         var url = 'https://api.api-ninjas.com/v1/quotes?category=' + categoria;
+
+        // Realizar la solicitud AJAX
+        $.ajax({
+            method: 'GET',
+            url: url,
+            headers: { 'X-Api-Key': 'BZCMTy/nqeOpgxpRMBrRHg==LD9hEceJAiy7y2cW' },
+            contentType: 'application/json',
+            success: function(result) {
+                // Manejar la respuesta exitosa
+                mostrarResultado(result);
+            },
+            error: function(jqXHR) {
+                // Manejar errores de la solicitud
+                console.error('Error: ', jqXHR.responseText);
+                mostrarResultadoError();
+            }
+        });
+    });
+});
+
+function mostrarResultado(data) {
+    // Limpiar el contenido anterior de la lista
+    $("#listaResultado").empty();
+
+    // Mostrar cada uno de los elementos del JSON en la lista
+    data.forEach(function(frase) {
+        $("#listaResultado").append("<li><strong>Frase:</strong> " + frase.quote + "</li>");
+        $("#listaResultado").append("<li><strong>Autor:</strong> " + frase.author + "</li>");
+        $("#listaResultado").append("<li><strong>Categoría:</strong> " + frase.category + "</li>");
+    });
+}
+
+function mostrarResultadoError() {
+    // Limpiar el contenido anterior de la lista
+    $("#listaResultado").empty();
+
+    // Mostrar un mensaje de error en la lista
+    $("#listaResultado").append("<li>Error al obtener las frases. Por favor, intenta de nuevo más tarde.</li>");
+}
