@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
+
+#define n 400000 // Definir largo de arreglo
+#define MAX_THREADS 4 // Definir número de hilos a usar
+
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];
+    int i = (low - 1);
+
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+void quicksortSequential(int arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quicksortSequential(arr, low, pi - 1);
+        quicksortSequential(arr, pi + 1, high);
+    }
+}
+
+void quicksortParallel(int arr[], int low, int high, int depth) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+
+        if (depth < MAX_THREADS) {
+            #pragma omp parallel sections
+            {
+                #pragma omp section
+                quicksortParallel(arr, low, pi - 1, depth + 1);
+
+                #pragma omp section
+                quicksortParallel(arr, pi + 1, high, depth + 1);
+            }
+        } else {
+            quicksortSequential(arr, low, pi - 1);
+            quicksortSequential(arr, pi + 1, high);
+        }
+    }
+}
+
+int main() {
+    int arr[n];
+
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand();
+    }
+
+    // Ordenamiento secuencial
+    double start_time_seq = omp_get_wtime();
+    quicksortSequential(arr, 0, n - 1);
+    double end_time_seq = omp_get_wtime();
+    printf("Tiempo de ejecución secuencial: %f segundos\n", end_time_seq - start_time_seq);
+
+    // Reinicializa el arreglo con números aleatorios
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand();
+    }
+
+    // Ordenamiento paralelo
+    double start_time_par = omp_get_wtime();
+    quicksortParallel(arr, 0, n - 1, 0);
+    double end_time_par = omp_get_wtime();
+    printf("Tiempo de ejecución paralelo: %f segundos\n", end_time_par - start_time_par);
+
+    return 0;
+}

@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+#include <pthread.h>
+
+#define NUM_POINTS 10000000  // Número total de puntos a generar
+#define NUM_THREADS 4         // Número de hilos a utilizar
+
+// Estructura para almacenar los resultados parciales de cada hilo
+struct ThreadData {
+    long long int points_in_circle;
+};
+
+// Función para generar puntos aleatorios y calcular el área estimada
+void *monte_carlo(void *arg) {
+    struct ThreadData *data = (struct ThreadData *)arg;
+    unsigned int seed = (unsigned int)time(NULL) + (unsigned int)pthread_self();
+    srand(seed);
+
+    data->points_in_circle = 0;
+
+    for (long long int i = 0; i < NUM_POINTS / NUM_THREADS; i++) {
+        double x = (double)rand() / RAND_MAX;
+        double y = (double)rand() / RAND_MAX;
+        double distance = x * x + y * y;
+
+        if (distance <= 1) {
+            data->points_in_circle++;
+        }
+    }
+
+    return NULL;
+}
+
+int main() {
+    clock_t start_time, end_time;
+    double total_time_sec;
+
+    // Versión secuencial
+    start_time = clock();
+
+    struct ThreadData data;
+    data.points_in_circle = 0;
+
+    monte_carlo(&data);
+
+    double pi_estimate = 4.0 * (double)data.points_in_circle / NUM_POINTS;
+    printf("Estimación de p (secuencial): %f\n", pi_estimate);
+
+    end_time = clock();
+    total_time_sec = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+    printf("Tiempo de ejecución (secuencial): %f segundos\n", total_time_sec);
+
+    // Versión paralela
+    start_time = clock();
+
+    pthread_t threads[NUM_THREADS];
+    struct ThreadData thread_data[NUM_THREADS];
+
+    for (int i = 0; i < NUM_THREADS; i++) {
+        pthread_create(&threads[i], NULL, monte_carlo, &thread_data[i]);
+    }
+
+    for (int i = 0; i < NUM_THREADS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    long long int total_points_in_circle = 0;
+
+    for (int i = 0; i < NUM_THREADS; i++) {
+        total_points_in_circle += thread_data[i].points_in_circle;
+    }
+
+    pi_estimate = 4.0 * (double)total_points_in_circle / NUM_POINTS;
+    printf("Estimación de p (paralela): %f\n", pi_estimate);
+
+    end_time = clock();
+    total_time_sec = (double)(end_time - start_time) / CLOCKS_PER_SEC;
+    printf("Tiempo de ejecución (paralela): %f segundos\n", total_time_sec);
+
+    return 0;
+}
