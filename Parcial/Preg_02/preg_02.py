@@ -1,14 +1,12 @@
 import cv2
 import numpy as np
-from concurrent.futures import ThreadPoolExecutor
+import threading
 import requests
 from io import BytesIO
 
-
-def aplicar_filtro(img, kernel):
+def aplicar_filtro(img, kernel, resultado, indice):
     img_filtrada = cv2.filter2D(img, -1, kernel)
-    return img_filtrada
-
+    resultado[indice] = img_filtrada
 
 def cargar_imagen(url):
     respuesta = requests.get(url)
@@ -17,6 +15,10 @@ def cargar_imagen(url):
         img = cv2.imdecode(np.frombuffer(datos_img.read(), np.uint8), -1)
         return img
 
+def procesar_parte(partes, kernel, resultados, indice):
+    parte = partes[indice]
+    img_filtrada = cv2.filter2D(parte, -1, kernel)
+    resultados[indice] = img_filtrada
 
 def main():
     url = "https://4.bp.blogspot.com/--2T-iuayG6g/VpWPGoNO8jI/AAAAAAAABWM/hEZmGxlAXYo/s640/unmsm.jpg"
@@ -25,12 +27,12 @@ def main():
     if img is None:
         return
 
-    # filtro de suavizado
+    # Filtro de suavizado
     kernel_suavizado = np.array([[1, 1, 1],
                                  [1, 1, 1],
                                  [1, 1, 1]]) / 9.0
 
-    # filtro de detección de bordes
+    # Filtro de detección de bordes
     kernel_bordes = np.array([[-1, -1, -1],
                               [-1, 8, -1],
                               [-1, -1, -1]])
@@ -39,6 +41,8 @@ def main():
     alto, ancho, _ = img.shape
     alto_parte = alto // num_hilos
     partes = []
+    resultados_suavizado = [None] * num_hilos
+    resultados_bordes = [None] * num_hilos
 
     for i in range(num_hilos):
         fila_inicio = i * alto_parte
@@ -46,21 +50,32 @@ def main():
         parte = img[fila_inicio:fila_fin, :, :]
         partes.append(parte)
 
-    with ThreadPoolExecutor(max_workers=num_hilos) as executor:
-        partes_filtradas_suavizado = list(executor.map(
-            lambda x: aplicar_filtro(x, kernel_suavizado), partes))
+    hilos_suavizado = []
+    hilos_bordes = []
 
-        partes_filtradas_bordes = list(executor.map(
-            lambda x: aplicar_filtro(x, kernel_bordes), partes))
+    for i in range(num_hilos):
+        hilo_suavizado = threading.Thread(target=procesar_parte, args=(partes, kernel_suavizado, resultados_suavizado, i))
+        hilo_bordes = threading.Thread(target=procesar_parte, args=(partes, kernel_bordes, resultados_bordes, i))
+        hilos_suavizado.append(hilo_suavizado)
+        hilos_bordes.append(hilo_bordes)
 
-    img_filtrada_suavizado = np.vstack(partes_filtradas_suavizado)
-    img_filtrada_bordes = np.vstack(partes_filtradas_bordes)
+    for hilo in hilos_suavizado:
+        hilo.start()
 
-    cv2.imshow('Imagen Suavizada', img_filtrada_suavizado)
-    cv2.imshow('Imagen con Deteccion de Bordes', img_filtrada_bordes)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    for hilo in hilos_bordes:
+        hilo.start()
 
+    for hilo in hilos_suavizado:
+        hilo.join()
+
+    for hilo in hilos_bordes:
+        hilo.join()
+
+    img_filtrada_suavizado = np.vstack(resultados_suavizado)
+    img_filtrada_bordes = np.vstack(resultados_bordes)
+
+    cv2.imwrite("imagen_suavizada_datos.jpg", img_filtrada_suavizado)
+    cv2.imwrite("imagen_con_bordes_datos.jpg", img_filtrada_bordes)
 
 if __name__ == "__main__":
     main()
