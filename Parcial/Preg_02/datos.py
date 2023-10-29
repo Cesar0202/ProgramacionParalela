@@ -36,8 +36,8 @@ def main():
         img_filtrada_suavizado = executor.submit(aplicar_filtro, img, kernel_suavizado).result()
         img_filtrada_bordes = executor.submit(aplicar_filtro, img, kernel_bordes).result()
 
-    cv2.imwrite("imagen_suavizada_tareas.jpg", img_filtrada_suavizado)
-    cv2.imwrite("imagen_con_bordes_tareas.jpg", img_filtrada_bordes)
+    cv2.imwrite("imagen_suavizada_datos.jpg", img_filtrada_suavizado)
+    cv2.imwrite("imagen_con_bordes_datos.jpg", img_filtrada_bordes)
 
 if __name__ == "__main__":
     main()
