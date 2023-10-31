@@ -1,29 +1,17 @@
-from timeit import default_timer
+import time
+import subprocess
 
-#funcion de prueba
-def sampleFunction(n):
-    return n
-    
-#Punto 1
-inicio_A = default_timer()
-sampleFunction(20)
-fin_A = default_timer()
+def medir_tiempo(script_nombre):
+    start_time = time.time()
+    subprocess.call(['python', script_nombre])
+    end_time = time.time()
+    tiempo_ejecucion = end_time - start_time
+    return tiempo_ejecucion
 
-print("Tiempo de ejecucion: ")
-print(fin_A - inicio_A, "segundos")
+tiempo_hilos = medir_tiempo('hilos.py')
+tiempo_datos = medir_tiempo('datos.py')
+tiempo_tareas = medir_tiempo('tareas.py')
 
-#Punto 2
-inicio_B = default_timer()
-sampleFunction(30)
-fin_B = default_timer()
-
-print("Tiempo de ejecucion: ")
-print(fin_B - inicio_B, "segundos")
-
-#Punto 3
-inicio_C = default_timer()
-sampleFunction(40)
-fin_C = default_timer()
-
-print("Tiempo de ejecucion: ")
-print(fin_C - inicio_C, "segundos")
+print(f'Tiempo de ejecución de hilos.py: {tiempo_hilos} segundos')
+print(f'Tiempo de ejecución de datos.py: {tiempo_datos} segundos')
+print(f'Tiempo de ejecución de tareas.py: {tiempo_tareas} segundos')
